@@ -1,0 +1,65 @@
+{
+  "name": "avocavo-nutrition-cli",
+  "version": "1.0.1",
+  "description": "Command-line interface for the Avocavo Nutrition API - Fast, accurate nutrition data with USDA verification",
+  "main": "index.js",
+  "bin": {
+    "avocavo": "./bin/avocavo.js",
+    "avocavo-nutrition": "./bin/avocavo.js"
+  },
+  "scripts": {
+    "test": "node test/test.js",
+    "prepublish": "npm test"
+  },
+  "keywords": [
+    "nutrition",
+    "api",
+    "usda",
+    "food",
+    "recipe",
+    "health",
+    "fitness",
+    "calories",
+    "macros",
+    "cli",
+    "command-line"
+  ],
+  "author": {
+    "name": "Avocavo",
+    "email": "api-support@avocavo.com",
+    "url": "https://avocavo.app"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/avocavo/nutrition-api-cli",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avocavo/nutrition-api-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/avocavo/nutrition-api-cli/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^10.0.1",
+    "ora": "^5.4.1",
+    "inquirer": "^8.2.6",
+    "open": "^8.4.2",
+    "table": "^6.8.1",
+    "conf": "^10.2.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "preferGlobal": true
+}
