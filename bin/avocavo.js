@@ -18,7 +18,7 @@ program
 // Global options
 program
   .option('-k, --api-key <key>', 'API key (overrides stored credentials)')
-  .option('--base-url <url>', 'API base URL', 'https://app.avocavo.app')
+  .option('--base-url <url>', 'API base URL', 'https://nutrition.avocavo.app')
   .option('--json', 'Output raw JSON')
   .option('--verbose', 'Verbose output');
 
@@ -325,7 +325,8 @@ program
       if (result.services) {
         console.log(chalk.bold('🔌 Services:'));
         Object.entries(result.services).forEach(([service, status]) => {
-          const icon = status === 'available' ? '✅' : status === 'degraded' ? '⚠️' : '❌';
+          const icon = (status === 'available' || status === 'connected') ? '✅' : 
+                      status === 'degraded' ? '⚠️' : '❌';
           console.log(`  ${icon} ${service}: ${status}`);
         });
       }
