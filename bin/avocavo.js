@@ -18,7 +18,7 @@ program
 // Global options
 program
   .option('-k, --api-key <key>', 'API key (overrides stored credentials)')
-  .option('--base-url <url>', 'API base URL', 'https://nutrition.avocavo.app')
+  .option('--base-url <url>', 'API base URL', 'https://app.avocavo.app')
   .option('--json', 'Output raw JSON')
   .option('--verbose', 'Verbose output');
 
@@ -457,7 +457,7 @@ program
       if (result.services) {
         console.log(chalk.bold('🔌 Services:'));
         Object.entries(result.services).forEach(([service, status]) => {
-          const icon = (status === 'available' || status === 'connected') ? '✅' : 
+          const icon = (status === 'available' || status === 'connected' || status.includes('total')) ? '✅' : 
                       status === 'degraded' ? '⚠️' : '❌';
           console.log(`  ${icon} ${service}: ${status}`);
         });
@@ -467,6 +467,32 @@ program
         console.log(chalk.bold('⚡ Performance:'));
         console.log(`  📊 Avg Response: ${result.performance.avg_response_time_ms}ms`);
         console.log(`  💾 Cache Hit Rate: ${result.performance.cache_hit_rate}%`);
+        
+        if (result.performance.uptime) {
+          console.log(`  ⏱️  Uptime: ${result.performance.uptime}`);
+        }
+        if (result.performance.api_calls_today !== undefined) {
+          console.log(`  📈 API Calls Today: ${result.performance.api_calls_today}`);
+        }
+        if (result.performance.active_users !== undefined) {
+          console.log(`  👥 Active Users: ${result.performance.active_users}`);
+        }
+      }
+      
+      if (result.dashboard_data) {
+        console.log(chalk.bold('📊 Dashboard Stats:'));
+        if (result.dashboard_data.total_users) {
+          console.log(`  👤 Total Users: ${result.dashboard_data.total_users}`);
+        }
+        if (result.dashboard_data.premium_users) {
+          console.log(`  💎 Premium Users: ${result.dashboard_data.premium_users}`);
+        }
+        if (result.dashboard_data.total_recipes) {
+          console.log(`  🍳 Total Recipes: ${result.dashboard_data.total_recipes}`);
+        }
+        if (result.dashboard_data.avg_rating) {
+          console.log(`  ⭐ Avg Rating: ${result.dashboard_data.avg_rating.toFixed(1)}`);
+        }
       }
     } catch (error) {
       console.error(chalk.red(`❌ Health check error: ${error.message}`));
