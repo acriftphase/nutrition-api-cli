@@ -1,6 +1,6 @@
 {
   "name": "avocavo-nutrition-cli",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Command-line interface for the Avocavo Nutrition API - Fast, accurate nutrition data with USDA verification",
   "main": "index.js",
   "bin": {
@@ -30,13 +30,13 @@
     "url": "https://avocavo.app"
   },
   "license": "MIT",
-  "homepage": "https://github.com/avocavo/nutrition-api-cli",
+  "homepage": "https://nutrition.avocavo.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/avocavo/nutrition-api-cli.git"
+    "url": "https://github.com/acriftphase/nutrition-api-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/avocavo/nutrition-api-cli/issues"
+    "url": "https://github.com/acriftphase/nutrition-api-cli/issues"
   },
   "engines": {
     "node": ">=14.0.0",
