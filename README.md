@@ -47,8 +47,9 @@ avocavo health
 
 ### ✅ OAuth Authentication
 - **Seamless login** with Google or GitHub
-- **Automatic API key management**
-- **Secure credential storage**
+- **Multiple API key management** for different environments
+- **Secure credential storage** with active key selection
+- **Easy switching** between development and production keys
 
 ### ⚡ Fast Analysis
 - **Single ingredients** with USDA verification
@@ -88,6 +89,25 @@ Logout and remove stored credentials
 
 #### `avocavo status`
 Show current login status and account information
+
+#### `avocavo keys [options]`
+Manage multiple API keys for different environments or projects
+
+```bash
+avocavo keys --list              # List all stored API keys
+avocavo keys --switch <keyId>    # Switch to a different API key
+avocavo keys --add <key> -n "production"  # Add manual API key
+avocavo keys --remove <keyId>    # Remove an API key
+avocavo keys --validate          # Validate current active key
+```
+
+**Options:**
+- `-l, --list` - List all stored API keys with active indicator
+- `-s, --switch <keyId>` - Switch to a different API key
+- `-a, --add <apiKey>` - Add an API key manually
+- `-n, --nickname <name>` - Nickname for manually added key
+- `-r, --remove <keyId>` - Remove an API key
+- `--validate [keyId]` - Validate API key (current active key if none specified)
 
 ### Analysis Commands
 
@@ -226,14 +246,33 @@ avocavo login
 - Automatically stores API key securely
 - No need to copy/paste API keys
 
-### 2. Direct API Key
+### 2. Multiple API Keys Management
+```bash
+# List all stored keys (shows active key with green indicator)
+avocavo keys --list
+
+# Add a production API key
+avocavo keys --add ak_prod_xyz123 --nickname "Production"
+
+# Switch between environments
+avocavo keys --switch manual-production-1234567890
+
+# Remove old keys
+avocavo keys --remove google-olduser-1234567890
+```
+- Store multiple keys for different environments or projects
+- Easily switch between development, staging, and production
+- Active key is used automatically for all commands
+
+### 3. Direct API Key
 ```bash
 avocavo -k your_api_key_here ingredient "1 cup rice"
 ```
 - Use your own API key directly
 - Good for CI/CD and scripting
+- Overrides any stored active key
 
-### 3. Environment Variable
+### 4. Environment Variable
 ```bash
 export AVOCAVO_API_KEY=your_api_key_here
 avocavo ingredient "1 cup rice"

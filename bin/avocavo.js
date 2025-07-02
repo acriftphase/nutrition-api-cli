@@ -69,6 +69,138 @@ program
     }
   });
 
+// Keys management command
+program
+  .command('keys')
+  .description('Manage API keys')
+  .option('-l, --list', 'List all stored API keys')
+  .option('-s, --switch <keyId>', 'Switch to a different API key')
+  .option('-a, --add <apiKey>', 'Add an API key manually')
+  .option('-n, --nickname <name>', 'Nickname for manually added key')
+  .option('-r, --remove <keyId>', 'Remove an API key')
+  .option('--validate [keyId]', 'Validate API key (current active key if none specified)')
+  .action(async (options) => {
+    try {
+      // List all keys
+      if (options.list) {
+        const keys = auth.getAllKeys();
+        const activeKeyId = auth.getActiveKeyId();
+        
+        if (Object.keys(keys).length === 0) {
+          console.log(chalk.yellow('⚠️  No API keys stored'));
+          console.log(chalk.cyan('💡 Run: avocavo login or avocavo keys --add <key>'));
+          return;
+        }
+        
+        console.log(chalk.bold('🔑 Stored API Keys:'));
+        console.log('');
+        
+        for (const [keyId, keyData] of Object.entries(keys)) {
+          const isActive = keyId === activeKeyId;
+          const activeIndicator = isActive ? chalk.green('● ACTIVE') : chalk.gray('○');
+          
+          console.log(`${activeIndicator} ${chalk.cyan(keyData.nickname)}`);
+          console.log(`  📝 ID: ${chalk.gray(keyId)}`);
+          console.log(`  🔑 Key: ${chalk.gray(keyData.key.substring(0, 12))}...`);
+          console.log(`  🌐 Provider: ${chalk.gray(keyData.provider)}`);
+          if (keyData.userInfo?.email) {
+            console.log(`  📧 Email: ${chalk.gray(keyData.userInfo.email)}`);
+          }
+          console.log(`  📅 Added: ${chalk.gray(new Date(keyData.loginTime).toLocaleDateString())}`);
+          console.log('');
+        }
+        return;
+      }
+      
+      // Switch active key
+      if (options.switch) {
+        const success = auth.setActiveKey(options.switch);
+        if (success) {
+          const keyInfo = auth.getKeyInfo(options.switch);
+          console.log(chalk.green(`✅ Switched to: ${keyInfo.nickname}`));
+        } else {
+          console.log(chalk.red(`❌ Key not found: ${options.switch}`));
+          process.exit(1);
+        }
+        return;
+      }
+      
+      // Add manual key
+      if (options.add) {
+        const nickname = options.nickname || `manual-${Date.now()}`;
+        const keyId = auth.addManualKey(options.add, nickname);
+        console.log(chalk.green(`✅ Added API key: ${nickname}`));
+        console.log(chalk.gray(`📝 ID: ${keyId}`));
+        
+        // Validate the new key
+        const validation = await auth.validateApiKey(options.add);
+        if (validation.valid) {
+          console.log(chalk.green(`✅ ${validation.message}`));
+        } else {
+          console.log(chalk.yellow(`⚠️  ${validation.message}`));
+        }
+        return;
+      }
+      
+      // Remove key
+      if (options.remove) {
+        const keyInfo = auth.getKeyInfo(options.remove);
+        if (!keyInfo) {
+          console.log(chalk.red(`❌ Key not found: ${options.remove}`));
+          process.exit(1);
+        }
+        
+        const success = auth.removeKey(options.remove);
+        if (success) {
+          console.log(chalk.green(`✅ Removed API key: ${keyInfo.nickname}`));
+        } else {
+          console.log(chalk.red(`❌ Failed to remove key: ${options.remove}`));
+          process.exit(1);
+        }
+        return;
+      }
+      
+      // Validate key
+      if (options.validate !== undefined) {
+        const keyToValidate = options.validate || auth.getActiveKeyId();
+        if (!keyToValidate) {
+          console.log(chalk.red('❌ No key specified and no active key found'));
+          process.exit(1);
+        }
+        
+        const keyInfo = auth.getKeyInfo(keyToValidate);
+        const apiKey = keyInfo ? keyInfo.key : keyToValidate;
+        
+        console.log(chalk.cyan('🔍 Validating API key...'));
+        const validation = await auth.validateApiKey(apiKey);
+        
+        if (validation.valid) {
+          console.log(chalk.green(`✅ ${validation.message}`));
+        } else {
+          console.log(chalk.red(`❌ ${validation.message}`));
+          process.exit(1);
+        }
+        return;
+      }
+      
+      // Default: show help
+      console.log(chalk.cyan('🔑 API Key Management'));
+      console.log('');
+      console.log('Available commands:');
+      console.log('  avocavo keys --list                    List all stored keys');
+      console.log('  avocavo keys --switch <keyId>          Switch active key');
+      console.log('  avocavo keys --add <key> -n <name>     Add manual key');
+      console.log('  avocavo keys --remove <keyId>          Remove a key');
+      console.log('  avocavo keys --validate [keyId]        Validate key');
+      console.log('');
+      console.log('💡 Use --list to see available key IDs');
+      
+    } catch (error) {
+      console.error(chalk.red(`❌ Keys management error: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
 // Status command
 program
   .command('status')
@@ -372,6 +504,8 @@ program.addHelpText('after', `
 Examples:
   $ avocavo login                          # Login with Google OAuth
   $ avocavo status                         # Check login status
+  $ avocavo keys --list                    # List all stored API keys
+  $ avocavo keys --switch <keyId>          # Switch active API key
   $ avocavo ingredient "1 cup rice"        # Analyze single ingredient
   $ avocavo recipe -i "2 cups flour" "1 cup milk" -s 8  # Analyze recipe
   $ avocavo batch -i "1 cup rice" "2 tbsp oil" "4 oz chicken"  # Batch analysis
@@ -379,6 +513,7 @@ Examples:
 
 Authentication:
   $ avocavo login                          # OAuth login (recommended)
+  $ avocavo keys --add <key> -n "prod"     # Add manual API key
   $ avocavo -k your_api_key ingredient ... # Use API key directly
 
 Documentation:
