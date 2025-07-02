@@ -1,6 +1,6 @@
 {
   "name": "avocavo-nutrition-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Command-line interface for the Avocavo Nutrition API - Fast, accurate nutrition data with USDA verification",
   "main": "index.js",
   "bin": {
